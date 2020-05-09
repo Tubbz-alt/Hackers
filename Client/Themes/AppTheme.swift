@@ -11,8 +11,6 @@ import UIKit
 struct AppTheme {
     var appTintColor: UIColor
 
-    var statusBarStyle: UIStatusBarStyle
-
     var backgroundColor: UIColor
 
     var titleTextColor: UIColor
@@ -31,51 +29,48 @@ struct AppTheme {
 }
 
 extension AppTheme {
-    private static let appTintColorLight = UIColor(rgb: 0x6513E5)
-    private static let appTintColorDark = UIColor(rgb: 0xA06FED)
+    private static func themeBuilder(_ userInterfaceStyle: UIUserInterfaceStyle? = nil) -> AppTheme {
+        // always get a fresh trait collection as the user may have changed system appearance
+        var traitCollection = currentTraitCollection()
+        var selectedUserInterfaceStyle = traitCollection.userInterfaceStyle
 
-    static let light = AppTheme(
-        appTintColor: appTintColorLight,
+        // if a specific theme is selected
+        if let userInterfaceStyle = userInterfaceStyle {
+            traitCollection = UITraitCollection(userInterfaceStyle: userInterfaceStyle)
+            selectedUserInterfaceStyle = userInterfaceStyle
+        }
 
-        statusBarStyle: .darkContent,
+        return AppTheme(
+            appTintColor: UIColor(named: "appTintColor", in: nil, compatibleWith: traitCollection)!,
 
-        backgroundColor: .white,
+            backgroundColor: .systemBackground,
 
-        titleTextColor: .black,
-        textColor: UIColor(rgb: 0x555555),
-        lightTextColor: UIColor(rgb: 0xAAAAAA),
+            titleTextColor: UIColor(named: "titleTextColor", in: nil, compatibleWith: traitCollection)!,
+            textColor: UIColor(named: "textColor", in: nil, compatibleWith: traitCollection)!,
+            lightTextColor: UIColor(named: "lightTextColor", in: nil, compatibleWith: traitCollection)!,
 
-        cellHighlightColor: UIColor(rgb: 0xF4D1F2),
-        separatorColor: UIColor(rgb: 0xCACACA),
+            cellHighlightColor: UIColor(named: "cellHighlightColor", in: nil, compatibleWith: traitCollection)!,
+            separatorColor: UIColor(named: "separatorColor", in: nil, compatibleWith: traitCollection)!,
 
-        groupedTableViewBackgroundColor: UIColor(rgb: 0xF2F2F7),
-        groupedTableViewCellBackgroundColor: .white,
+            groupedTableViewBackgroundColor: UIColor(named: "groupedTableViewBackgroundColor",
+                                                     in: nil, compatibleWith: traitCollection)!,
+            groupedTableViewCellBackgroundColor: UIColor(named: "groupedTableViewCellBackgroundColor",
+                                                         in: nil, compatibleWith: traitCollection)!,
+            upvotedColor: UIColor(named: "upvotedColor", in: nil, compatibleWith: traitCollection)!,
 
-        upvotedColor: UIColor(rgb: 0xFF9300),
+            userInterfaceStyle: selectedUserInterfaceStyle
+        )
+    }
 
-        userInterfaceStyle: .light
-    )
+    private static func currentTraitCollection() -> UITraitCollection {
+        // use a fresh UIViewController uncontaminated by theme changes
+        let viewController = UIViewController()
+        return viewController.traitCollection
+    }
 
-    static let dark = AppTheme(
-        appTintColor: appTintColorDark,
-
-        statusBarStyle: .lightContent,
-
-        backgroundColor: .black,
-
-        titleTextColor: UIColor(rgb: 0xDDDDDD),
-        textColor: UIColor(rgb: 0xAAAAAA),
-        lightTextColor: UIColor(rgb: 0x555555),
-
-        cellHighlightColor: UIColor(rgb: 0x34363D),
-        separatorColor: UIColor(rgb: 0x757575),
-
-        // these are colours for a presented VC
-        groupedTableViewBackgroundColor: UIColor(rgb: 0x1c1c1e),
-        groupedTableViewCellBackgroundColor: UIColor(rgb: 0x2c2c2e),
-
-        upvotedColor: UIColor(rgb: 0xFF9300),
-
-        userInterfaceStyle: .dark
-    )
+    static let light = AppTheme.themeBuilder(.light)
+    static let dark = AppTheme.themeBuilder(.dark)
+    static var system: AppTheme {
+        AppTheme.themeBuilder()
+    }
 }

@@ -24,24 +24,31 @@ enum OnboardingService {
             keyValueable: UserDefaults.standard
         )
 
+        let viewController: WhatsNewViewController?
+
         if forceShow {
-            return WhatsNewViewController(
+            viewController = WhatsNewViewController(
                 whatsNew: whatsNew,
                 configuration: configuration()
             )
         } else {
-            return WhatsNewViewController(
+            viewController = WhatsNewViewController(
                 whatsNew: whatsNew,
                 configuration: configuration(),
                 versionStore: keyValueVersionStore
             )
         }
+
+        let theme = AppThemeProvider.shared.currentTheme
+        viewController?.overrideUserInterfaceStyle = theme.userInterfaceStyle
+
+        return viewController
     }
 
     private static func configuration() -> WhatsNewViewController.Configuration {
         let appTheme = AppThemeProvider.shared.currentTheme
         let theme = WhatsNewViewController.Theme { theme in
-            theme.backgroundColor = appTheme.groupedTableViewBackgroundColor
+            theme.backgroundColor = appTheme.backgroundColor
             theme.titleView.titleColor = appTheme.titleTextColor
             theme.completionButton.backgroundColor = appTheme.appTintColor
             theme.completionButton.titleColor = .white
